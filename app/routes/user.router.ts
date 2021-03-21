@@ -1,47 +1,15 @@
-import { Router } from 'express';
-import UserController from '../controllers/user.controller';
-import verifyJWT from '../config/jwt';
+import { Router } from "express";
+import { TableNames } from "../controllers/default.controller";
+import { DefaultRouter } from './default.router'
 
-const controller = new UserController()
-const UserRouter = Router();
+// const controller = new UserController()
+const UserRouter = new DefaultRouter({
+    tableName: TableNames.users
+}).router;
 
-UserRouter.use(verifyJWT)
-
-UserRouter.get('/', async (request, response)=> {  
-  try{
-    const users = await controller.getAll(request.body)
-    return response.json(users);
-  }catch(e){
-    return response.json(e)
-  }
-});
-
-UserRouter.post('/create', async (request, response, next)=> {  
-  try{
-    const users = await controller.create(request.body)
-    return response.json(users);
-  }catch(e){
-    return response.json(e)
-  }
-});
-
-UserRouter.put('/update', async (request, response)=> {
-  try{
-    const users = await controller.update(request.body.data, request.body.where)
-    return response.json(users);
-  }catch(e){
-    return response.json(e)
-  }
-});
-
-UserRouter.post('/createRandomUser', async (request, response)=> {
-  try{
-    const users = await controller.createRandomUser()
-    return response.json(users);
-  }catch(e){
-    return response.json(e)
-  }
-});
+// UserRouter.get('/my', (req: any, res: any)=>{
+//   return res.json('biirl')
+// })
 
 
-export default UserRouter;
+export default UserRouter

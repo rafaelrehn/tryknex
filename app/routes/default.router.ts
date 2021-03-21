@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import UserController from '../controllers/user.controller';
+// import UserController from '../controllers/user.controller';
 import verifyJWT from '../config/jwt';
 import DefaultController, { DefaultConstructor } from '../controllers/default.controller';
 
@@ -34,6 +34,15 @@ export class DefaultRouter{
             }
         });
 
+        this.router.delete('/delete', async (request, response)=> {  
+            try{
+              const db = await this.controller.delete()
+              return response.json(db);
+            }catch(e){
+              return response.json(e)
+            }
+        });
+
         this.router.get('/', async (request, response)=> {  
             try{
               const db = await this.controller.getAll(request.body)
@@ -42,6 +51,9 @@ export class DefaultRouter{
               return response.json(e)
             }
         });
+
+
+        
     }
     
 }
