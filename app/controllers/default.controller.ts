@@ -1,7 +1,9 @@
 import { knex } from "../../conn"
 
 export enum TableNames{
-    users = 'users'
+    users = 'users',
+    veiculos = 'veiculos',
+    utilitarios = 'utilitarios'
 }
 
 export interface DefaultConstructor{
@@ -48,7 +50,7 @@ export class DefaultController{
             if(!_data){
                 return {
                     success: false,
-                    data: 'Expected data object'
+                    message: 'Expected data object'
                 }
             }          
             const model: any[] = await knex.table(this.enviroment.tableName).insert(_data)
@@ -62,9 +64,16 @@ export class DefaultController{
         }
     }
 
-    async read(): Promise<DefaultResponse>{
+    async read(where: any): Promise<DefaultResponse>{
         try{
-            const model: any[] = [] // = await knex.table(this.enviroment.tableName).insert(_data)
+            if(!where){
+                return {
+                    success: false,
+                    message: 'Expected where object'
+                }
+            }
+            // const model: any[] = [] // = await knex.table(this.enviroment.tableName).insert(_data)
+            const model: any[] = await knex.table(this.enviroment.tableName).where(where)
             return {
                 success: true,
                 data: model
@@ -88,7 +97,6 @@ export class DefaultController{
                 return {
                     success: false,
                     message: 'Clauses where has no match object'
-                    // data: model
                 }
             }else{
                 return {
@@ -117,23 +125,23 @@ export class DefaultController{
 
     async getAll(request: GetAllParams): Promise<DefaultGetAllResponse>{
         try{             
-            const _where = request.where || {}
-            const _itemsPerPage = request.itemsPerPage || 10
-            let _page = request.currentPage || 0;
-            const _offset = (_page) * _itemsPerPage;
-            const _limit  = request.itemsPerPage||10
-            const paginate:any = await knex.table(this.enviroment.tableName).count('* as rows').where(_where).first()
-            const data: any[] = await knex.table(this.enviroment.tableName).where(_where).offset(_offset).limit(_limit)
+            const where = request.where || {}
+            const itemsPerPage = request.itemsPerPage || 10
+            let PAGE = request.currentPage || 0;
+            const offset = (PAGE) * itemsPerPage;
+            const limit  = request.itemsPerPage||10
+            const paginate:any = await knex.table(this.enviroment.tableName).count('* as rows').where(where).first()
+            const data: any[] = await knex.table(this.enviroment.tableName).where(where).offset(offset).limit(limit)
 
-            const _lastPage = Math.ceil(paginate.rows / _itemsPerPage) - 1
+            const _lastPage = Math.ceil(paginate.rows / itemsPerPage) - 1
             return {
                 success: true,
                 data: {
                     rows: paginate.rows,
-                    currentPage: _page,
+                    currentPage: PAGE,
                     firstPage: 1,
                     lastPage: _lastPage,
-                    itemsPerPage: _itemsPerPage,
+                    itemsPerPage: itemsPerPage,
                     data: data,
                 }
             }

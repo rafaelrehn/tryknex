@@ -5,46 +5,51 @@ import { TableNames } from "./default.controller";
 require("dotenv-safe").config();
 var jwt = require('jsonwebtoken');
 
+
 export class AuthController {
     
     constructor(
     ){
     }
 
-    login(req: any, res: any) {
-        // console.log(req.body)
-        const first_name = req.body.first_name;
-        const last_name = req.body.last_name;
-        // const sql = `SELECT * FROM usuario WHERE email = '${email}' && senha = '${pwd}'`;
-        const user = {
-            first_name: first_name,
-            last_name: last_name,            
-            // password: 'admin'
+    async login(req: any, res: any) {
+        try{
+            const email = req.body.email;
+            const password = req.body.password;
+            const user = {
+                email: email,
+                password: password,            
+            }
+            const resQuery = await knex.select('*').from(TableNames.users).where(user)        
+            if(resQuery.length == 0){
+                res.status(401).json({
+                    message: 'Login inválido!',
+                    success: false,
+                    
+                });
+            }else{
+                const uuid = resQuery[0].uuid;
+                const empresaUuid = resQuery[0].empresa_uuid;
+                const authDate = new Date();
+                var token = jwt.sign({ uuid, empresaUuid, authDate }, process.env.SECRET, {
+                expiresIn: 99999999999 // expires in 5min
+                });
+                return res.json({ 
+                    message: 'Login válido!',
+                    success: true,
+                    token: token,
+                    userInfo: resQuery[0]
+                })
+            }
+
+        }catch(e){
+            console.error(e)
+            res.json({ 
+                message: 'Login inválido!',
+                success: false
+            })
         }
-        knex.select('*').from(TableNames.users).where(user).then(resQuery=>{        
-                if(resQuery.length == 0){
-                    res.status(401).json({
-                        message: 'Login inválido!',
-                        success: false,
-                        
-                    });
-                }else{
-                    const uuid = resQuery[0].uuid; //esse id viria do banco de dados
-                    const empresaUuid = resQuery[0].empresa_uuid;
-                    const authDate = new Date();
-                    var token = jwt.sign({ uuid, empresaUuid, authDate }, process.env.SECRET, {
-                    expiresIn: 99999999999 // expires in 5min
-                    });
-                    return res.json({ 
-                        message: 'Login válido!',
-                        success: true,
-                        token: token,
-                        userInfo: resQuery[0]
-                    })
-                }
-        }).catch(err=>{
-            if(err) throw err;
-        })
+        
     }
 
     

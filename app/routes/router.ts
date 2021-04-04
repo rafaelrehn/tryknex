@@ -1,15 +1,13 @@
 import { Router } from 'express';
+import { TableNames } from '../controllers/default.controller';
 import AuthRouter from './auth.router';
-import UserRouter from './user.router';
-// import UserRouter from './user.router';
-// import User2DefaultRouter from './user2.router';
-// import User2Router from './user2.router';
+import DefaultRouter from './default.router';
 
 const Routes = Router();
 
+const UserRouter = new DefaultRouter({tableName: TableNames.users}).router;
+
 Routes.use('/users', UserRouter);
 Routes.use('/auth', AuthRouter)
-// Routes.use('/users2', User2DefaultRouter)
-
 
 export default Routes;
