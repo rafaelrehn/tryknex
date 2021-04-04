@@ -7,6 +7,8 @@ export async function up(knex: Knex): Promise<void> {
        table.string('username', 255).notNullable();
        table.string('password', 255).notNullable();
        table.string('email', 255).notNullable();
+       table.dateTime('criado_em').defaultTo(new Date().toISOString());
+       table.dateTime('atualizado_em').defaultTo(new Date().toISOString());
     })
 }
 

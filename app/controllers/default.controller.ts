@@ -94,7 +94,8 @@ export class DefaultController{
                     message: 'Expecting data and where object content'
                 }
             } 
-            const model: number = await knex.table(this.enviroment.tableName).where(_where).update(_data)
+            const upd_data = Object.assign(_data, {atualizado_em: new Date().toISOString()})
+            const model: number = await knex.table(this.enviroment.tableName).where(_where).update(upd_data)
             if(model == 0){
                 return {
                     success: false,
