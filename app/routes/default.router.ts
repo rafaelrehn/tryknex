@@ -36,9 +36,10 @@ export class DefaultRouter{
             }
         });
 
-        this.router.get('/read', async (request, response)=> {  
+        this.router.get('/read/:id', async (request, response)=> {  
             try{
-              const db = await this.controller.read(request.body.where)
+              const { id: ID } = request.params;
+              const db = await this.controller.read(ID)
               return response.json(db);
             }catch(e){
               return response.json(e)

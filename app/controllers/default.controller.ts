@@ -64,15 +64,17 @@ export class DefaultController{
         }
     }
 
-    async read(where: any): Promise<DefaultResponse>{
+    async read(ID: string|number): Promise<DefaultResponse>{
         try{
-            if(!where){
+            if(!ID){
                 return {
                     success: false,
-                    message: 'Expected where object'
+                    message: 'Expected ID param'
                 }
             }
-            // const model: any[] = [] // = await knex.table(this.enviroment.tableName).insert(_data)
+            const where = {
+                id: ID
+            }            
             const model: any[] = await knex.table(this.enviroment.tableName).where(where)
             return {
                 success: true,
